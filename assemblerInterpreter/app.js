@@ -47,7 +47,6 @@ const simple_assembler = (program) => {
       } else {
         const value = variables.find((variable) => variable.name === parameter).value
           
-          console.log(value)
         if (value != 0) {
           const coppyProgram = [...program];
           const newProgram = coppyProgram.splice(
