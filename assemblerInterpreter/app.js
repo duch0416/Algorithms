@@ -1,5 +1,5 @@
-const program = ["mov a 5", "inc a", "dec a", "dec a", "jnz a 1", "inc a"];
-
+const program = ['mov a -10','mov b a','inc a','dec b','jnz a -2'];
+const variables = [];
 const instructions = {
   INC: "inc",
   DEC: "dec",
@@ -7,41 +7,68 @@ const instructions = {
   JNZ: "jnz",
 };
 
-const splitInstructions = (program) => {
-  return program.map((instruction) => {
-    return {
-      name: instruction.split(" ").splice(0, 1).join(""),
-      parameter: instruction.split(" ").splice(1, 1).join(""),
-      value: instruction.split(" ").splice(2, 1).join("")
-        ? parseInt(instruction.split(" ").splice(2, 1).join(""))
-        : 0,
-    };
+const calculate = (variables, instruction, parameter) => {
+  variables.forEach((variable) => {
+    if (variable.name === parameter) {
+      if (instruction === instructions.INC) {
+        variable.value = variable.value + 1;
+      } else {
+        variable.value = variable.value - 1;
+      }
+    }
   });
 };
 
 const simple_assembler = (program) => {
-  const instructionsArr = splitInstructions(program);
-  let a;
+  program.forEach((instruction, index) => {
+    const instName = instruction.split(" ").splice(0, 1).join("");
+    const instValue = isNaN(
+      parseInt(instruction.split(" ").splice(2, 1).join(""))
+    )
+      ? instruction.split(" ").splice(2, 1).join("")
+      : parseInt(instruction.split(" ").splice(2, 1).join(""));
+    const parameter = instruction.split(" ").splice(1, 1).join("");
 
-  for (let i = 0; i < instructionsArr.length; i++) {
-    if (instructionsArr[i].name === instructions.MOV) {
-      a = instructionsArr[i].value;
-    } else if (instructionsArr[i].name === instructions.INC) {
-      a++;
-    } else if (instructionsArr[i].name === instructions.DEC) {
-      a--;
-    } else if (instructionsArr[i].name === instructions.JNZ) {
-      for (let j = a; j > 0; j--) {
-        if (instructionsArr[i].value > 0) {
-          a--;
-        } else {
-          a++;
+
+
+    if (instName === instructions.MOV) {
+      if (typeof instValue === "string") {
+        const value = variables.find((variable) => variable.name === instValue)
+          .value;
+        variables.push({ name: parameter, value: value });
+      } else {
+        variables.push({ name: parameter, value: instValue });
+      }
+    } else if (instName === instructions.INC || instName === instructions.DEC) {
+      calculate(variables, instName, parameter);
+    } else if (instName === instructions.JNZ) {
+      if (instValue > 0) {
+        program.splice(index, instValue)
+      } else {
+        const value = variables.find((variable) => variable.name === parameter).value
+          
+          console.log(value)
+        if (value != 0) {
+          const coppyProgram = [...program];
+          const newProgram = coppyProgram.splice(
+            index + instValue,
+            Math.abs(instValue) + 1
+          );
+          return simple_assembler(newProgram, variables);
         }
       }
     }
-  }
-  console.log(a);
-  console.log(instructionsArr);
+  });
+
+
+  let obj = variables.reduce((obj, item) => {
+    obj[item.name] = item.value;
+    return obj;
+  }, {});
+
+
+  console.log(obj);
+  return obj;
 };
 
-simple_assembler(program);
+simple_assembler(program, variables);
