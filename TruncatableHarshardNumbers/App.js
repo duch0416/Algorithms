@@ -6,17 +6,18 @@ const checkIsHarshard = (num) => {
     .map((digit) => parseInt(digit));
 
   digitsSum = digitsArr.reduce((acc, value) => (acc += value), 0);
-  
+
   if (num % digitsSum == 0) {
     if (num / digitsSum > 10) {
-      const truncatedNum = parseInt(digitsArr.splice(0, digitsArr.length - 1).join(""));
-      console.log(truncatedNum);
-      truncationNums = [...truncationNums, checkIsHarshard(truncatedNum)];
-      if(truncationNums[truncationNums.length -1]){
-        return truncationNums[0];
+      if(!truncationNums[truncationNums.length -1]){
+        return false
       }else {
-          return false
-      }
+        const truncatedNum = parseInt(digitsArr.splice(0, digitsArr.length - 1).join(""));
+        truncationNums = [...truncationNums, checkIsHarshard(truncatedNum)];
+        if(truncationNums[truncationNums.length -1]){
+        return truncationNums[0];
+        }
+      } 
     } else if (num / digitsSum <= 10 || num / digitsSum === num) {
       return truncationNums[0];
     }
@@ -25,7 +26,7 @@ const checkIsHarshard = (num) => {
 
 const rthnBetween = (a, b) => {
   const numsBetweenAB = [];
-  const harshardNums = [];
+//   const harshardNums = [];
   if (a <= 10) {
     for (let i = 10; i <= b; i++) {
       numsBetweenAB.push(i);
@@ -35,9 +36,11 @@ const rthnBetween = (a, b) => {
       numsBetweenAB.push(i);
     }
   }
-  numsBetweenAB.forEach((num) => checkIsHarshard(num) && harshardNums.push(checkIsHarshard(num)));
-  console.log(harshardNums)
-  return harshardNums;
+//   console.log("ok")
+//   return numsBetweenAB.filter((num) => checkIsHarshard(num) && (checkIsHarshard(num)));
+//   console.log(harshardNums)
+console.log(numsBetweenAB)
+  return numsBetweenAB;
 };
 
-rthnBetween(2200, 2300);
+rthnBetween(0, 100000000);
